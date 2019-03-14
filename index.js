@@ -13,8 +13,8 @@ express()
   .set('view engine', 'ejs')
   .get('/', (req, res) => res.render('pages/kickCounter'))
 
-    .get('/mother/:motherId', getMother)
-    .post('/mother', createMother)
+    .post('/login', getMother)
+    .post('/signUp', createMother)
 
     .get('/kick/:kickId', getKick)
     .post('/kick', createKick)
@@ -28,10 +28,12 @@ express()
 
 
 function getMother(request, response) {
-    const motherId = request.param.motherId;
+    const username = request.body.username;
+    const hashedPassword = request.body.password; //hash it
+
 
     // TODO: We should really check here for a valid id before continuing on...
-    db.getMother(motherId, function(error, result) {
+    db.getMother(username, function(error, result) {
         // This is the callback function that will be called when the DB is done.
         // The job here is just to send it back.
 
@@ -40,7 +42,10 @@ function getMother(request, response) {
             response.status(500).json({success: false, data: error});
         } else {
             const mother = result[0];
-            response.status(200).json(mother);
+            if (mother.password === hashedPassword) { //check password against given password
+                response.status(200).json(mother); //ok
+            }
+            response.status(200).json(); //wrong password
         }
     });
 }
@@ -122,7 +127,20 @@ function updateKickSession(request, response) {
 }
 
 function createMother(request, response) {
+    const username = request.body.username;
+    const password = request.body.password; //hash
+    db.createMother(username, password, function(error, result) {
+        // This is the callback function that will be called when the DB is done.
+        // The job here is just to send it back.
 
+        // Make sure we got a row with the person, then prepare JSON to send back
+        if (error || result == null) {
+            response.status(500).json({success: false, data: error});
+        } else {
+            const mother = result;
+            response.status(200).json(mother);
+        }
+    });
 }
 
 function createKickSession(request, response) {
