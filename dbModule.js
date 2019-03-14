@@ -8,7 +8,6 @@ exports = {
 
     },
 
-
     getKickSession: function (id, callback) {
 
     },

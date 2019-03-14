@@ -1,0 +1,19 @@
+<h3>Previous Sessions</h3>
+<div>
+    <ul>
+        <% kickSessions.forEach(function(k) { %>
+        <li class="d-flex flex-col">
+            <div>
+                <h5><%= k.session_start %></h5> - <h5># of Kicks: <%= k.kicks.length() %></h5>
+            </div>
+            <div>
+                <h5>Duration: <%= (k.finish_time  - k.session_start) %></h5>
+            </div>
+        </li>
+        <% }); %>
+    </ul>
+    <div class="d-flex flex-row">
+        Date
+
+    </div>
+</div>

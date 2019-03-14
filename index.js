@@ -11,15 +11,27 @@ express()
   .use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
-  .get('/', (req, res) => res.render('pages/index'))
-  .listen(PORT, () => console.log(`Listening on ${ PORT }`));
+  .get('/', (req, res) => res.render('pages/kickCounter'))
+
+    .get('/mother/:motherId', getMother)
+    .post('/mother', createMother)
+
+    .get('/kick/:kickId', getKick)
+    .post('/kick', createKick)
+    .get('/kickSession/kick/:kickSessionId', getKicks)
+
+    .get('/kickSession/:kickSessionId', getKickSession)
+    .put('/kickSession/:kickSessionId', updateKickSession)
+    .post('/kickSession', createKickSession)
+    .get('/kickSessions/:motherId', getKickSessions)
+    .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
 
 function getMother(request, response) {
-    const id = request.query.id;
+    const motherId = request.param.motherId;
 
     // TODO: We should really check here for a valid id before continuing on...
-    db.getMother(id, function(error, result) {
+    db.getMother(motherId, function(error, result) {
         // This is the callback function that will be called when the DB is done.
         // The job here is just to send it back.
 
@@ -34,10 +46,10 @@ function getMother(request, response) {
 }
 
 function getKickSession(request, response) {
-    const id = request.query.id;
+    const kickSessionId = request.param.kickSessionId;
 
     // TODO: We should really check here for a valid id before continuing on...
-    getPersonFromDb(id, function(error, result) {
+    db.getKickSession(kickSessionId, function(error, result) {
         // This is the callback function that will be called when the DB is done.
         // The job here is just to send it back.
 
@@ -52,10 +64,10 @@ function getKickSession(request, response) {
 }
 
 function getKick(request, response) {
-    const id = request.query.id;
+    const kickId = request.query.kickId;
 
     // TODO: We should really check here for a valid id before continuing on...
-    getPersonFromDb(id, function(error, result) {
+    db.getKick(kickId, function(error, result) {
         // This is the callback function that will be called when the DB is done.
         // The job here is just to send it back.
 
@@ -70,10 +82,10 @@ function getKick(request, response) {
 }
 
 function getKickSessions(request, response) {
-    const id = request.query.id;
+    const motherId = request.query.motherId;
 
     // TODO: We should really check here for a valid id before continuing on...
-    getPersonFromDb(id, function(error, result) {
+    db.getKickSessions(motherId, function(error, result) {
         // This is the callback function that will be called when the DB is done.
         // The job here is just to send it back.
 
@@ -88,10 +100,10 @@ function getKickSessions(request, response) {
 }
 
 function getKicks(request, response) {
-    const id = request.query.id;
+    const kickSessionId = request.query.kickSessionId;
 
     // TODO: We should really check here for a valid id before continuing on...
-    getPersonFromDb(id, function(error, result) {
+    db.getKicks(kickSessionId, function(error, result) {
         // This is the callback function that will be called when the DB is done.
         // The job here is just to send it back.
 
