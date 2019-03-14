@@ -3,6 +3,9 @@ const {Pool} = require('pg');
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({connectionString: connectionString});
 
+//pg config
+const pg = require('pg');
+
 exports = {
     getMother: function (username, callback) {
 
@@ -28,7 +31,13 @@ exports = {
     },
 
     createMother: function (username, password, callback) {
-
+        const mother = {
+            id: 1,
+            username: username,
+            password: password
+        };
+        console.log('username: ${username}  password: ${password}');
+        callback(null, mother);
     },
 
     createKickSession: function () {

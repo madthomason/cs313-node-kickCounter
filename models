@@ -1,0 +1,138 @@
+const bcrypt = require('bcrypt');
+const db = require('./dbModule');
+
+
+
+
+exports = {
+
+    getMother: function (request, response) {
+        const username = request.body.username;
+        const password = request.body.password; //hash it
+
+
+            // TODO: We should really check here for a valid id before continuing on...
+        db.getMother(username, function (error, result) {
+            // This is the callback function that will be called when the DB is done.
+            // The job here is just to send it back.
+
+            // Make sure we got a row with the person, then prepare JSON to send back
+            if (error || result == null || result.length !== 1) {
+                response.status(500).json({success: false, data: error});
+            } else {
+                const mother = result[0];
+                bcrypt.compare(password, mother.password, function(err, res) {
+                    if(res) {
+                        // Passwords match
+                        response.status(200).json(mother); //ok
+                    } else {
+                        // Passwords don't match
+                        response.status(200).json(); //wrong password
+                    }
+                });
+
+
+                }
+        });
+    },
+    getKickSession: function (request, response) {
+        const kickSessionId = request.param.kickSessionId;
+
+        // TODO: We should really check here for a valid id before continuing on...
+        db.getKickSession(kickSessionId, function (error, result) {
+            // This is the callback function that will be called when the DB is done.
+            // The job here is just to send it back.
+
+            // Make sure we got a row with the person, then prepare JSON to send back
+            if (error || result == null || result.length !== 1) {
+                response.status(500).json({success: false, data: error});
+            } else {
+                const kickSession = result[0];
+                response.status(200).json(kickSession);
+            }
+        });
+    },
+    getKick: function (request, response) {
+        const kickId = request.query.kickId;
+
+        // TODO: We should really check here for a valid id before continuing on...
+        db.getKick(kickId, function (error, result) {
+            // This is the callback function that will be called when the DB is done.
+            // The job here is just to send it back.
+
+            // Make sure we got a row with the person, then prepare JSON to send back
+            if (error || result == null || result.length !== 1) {
+                response.status(500).json({success: false, data: error});
+            } else {
+                const kick = result[0];
+                response.status(200).json(kick);
+            }
+        });
+    },
+    getKickSessions: function (request, response) {
+        const motherId = request.query.motherId;
+
+        // TODO: We should really check here for a valid id before continuing on...
+        db.getKickSessions(motherId, function (error, result) {
+            // This is the callback function that will be called when the DB is done.
+            // The job here is just to send it back.
+
+            // Make sure we got a row with the person, then prepare JSON to send back
+            if (error || result == null) {
+                response.status(500).json({success: false, data: error});
+            } else {
+                const kickSessions = result;
+                response.status(200).json(kickSessions);
+            }
+        });
+    },
+    getKicks: function (request, response) {
+        const kickSessionId = request.query.kickSessionId;
+
+        // TODO: We should really check here for a valid id before continuing on...
+        db.getKicks(kickSessionId, function (error, result) {
+            // This is the callback function that will be called when the DB is done.
+            // The job here is just to send it back.
+
+            // Make sure we got a row with the person, then prepare JSON to send back
+            if (error || result == null) {
+                response.status(500).json({success: false, data: error});
+            } else {
+                const kicks = result;
+                response.status(200).json(kicks);
+            }
+        });
+    },
+    updateKickSession: function (request, response) {
+
+    },
+
+    createMother: function (request, response) {
+        const username = request.body.username;
+
+
+        bcrypt.hash('myPassword', 10, (err, password, username) => {
+            // Store hash in database
+            db.createMother(username, password, function (error, result) {
+                // This is the callback function that will be called when the DB is done.
+                // The job here is just to send it back.
+
+                // Make sure we got a row with the person, then prepare JSON to send back
+                if (error || result == null) {
+                    response.status(500).json({success: false, data: error});
+                } else {
+                    const mother = result;
+                    response.status(200).json(mother);
+                }
+            });
+        });
+
+    },
+    createKickSession: function (request, response) {
+
+    },
+    createKick: function (request, response) {
+
+    }
+
+};
