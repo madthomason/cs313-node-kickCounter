@@ -33,7 +33,7 @@ module.exports = {
     },
 
     createMother: function (username, password, callback) {
-        const query = 'INSERT INTO mother (username, password) VALUES ($1, $2)';
+        const query = 'INSERT INTO mother (username, password) VALUES ($1, $2) RETURNING id, username, password';
 
         pool.query(query, [username, password], callback);
     },
