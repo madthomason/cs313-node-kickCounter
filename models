@@ -9,23 +9,21 @@ module.exports = {
         const password = request.body.password;
 
         db.getMother(username, function (error, result) {
-            // This is the callback function that will be called when the DB is done.
-            // The job here is just to send it back.
 
             // Make sure we got a row with the person, then prepare JSON to send back
-            if (error || result === null || result.length !== 1) {
+            if (error || result === null || result.rows.length !== 1) {
                 response.status(500).json({success: false, data: error, result: result});
             } else {
-                const mother = result[0];
-               // bcrypt.compare(password, mother.password, function (err, res) {
-               //      if (res) {
+                const mother = result.rows[0];
+                bcrypt.compare(password, mother.password, function (err, res) {
+                    if (res) {
                         // Passwords match
                         response.status(200).json(mother); //ok
-                    // } else {
-                    //     // Passwords don't match
-                    //     response.status(400).json({success: false, data: "Wrong Username or password"});
-                    // }
-              //  });
+                    } else {
+                        // Passwords don't match
+                        response.status(400).json({success: false, data: "Wrong Username or password"});
+                    }
+               });
 
 
             }
