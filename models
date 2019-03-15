@@ -23,9 +23,7 @@ module.exports = {
                         // Passwords don't match
                         response.status(400).json({success: false, data: "Wrong Username or password"});
                     }
-               });
-
-
+                });
             }
         });
     },
@@ -34,15 +32,13 @@ module.exports = {
 
         // TODO: We should really check here for a valid id before continuing on...
         db.getKickSession(kickSessionId, function (error, result) {
-            // This is the callback function that will be called when the DB is done.
-            // The job here is just to send it back.
 
             // Make sure we got a row with the person, then prepare JSON to send back
-            if (error || result == null || result.length !== 1) {
+            if (error || result == null || result.rows.length !== 1) {
                 response.status(500).json({success: false, data: error});
             } else {
-                const kickSession = result[0];
-                response.status(200).json(kickSession);
+                const kickSession = result.rows[0];
+                db.getKicks(kickSessionId, addKicksToKickSession.bind({response: response, kickSession: kickSession}));
             }
         });
     },
@@ -51,14 +47,12 @@ module.exports = {
 
         // TODO: We should really check here for a valid id before continuing on...
         db.getKick(kickId, function (error, result) {
-            // This is the callback function that will be called when the DB is done.
-            // The job here is just to send it back.
 
             // Make sure we got a row with the person, then prepare JSON to send back
-            if (error || result == null || result.length !== 1) {
+            if (error || result == null || result.rows.length !== 1) {
                 response.status(500).json({success: false, data: error});
             } else {
-                const kick = result[0];
+                const kick = result.rows[0];
                 response.status(200).json(kick);
             }
         });
@@ -76,6 +70,9 @@ module.exports = {
                 response.status(500).json({success: false, data: error});
             } else {
                 const kickSessions = result.rows;
+                kickSessions.forEach(kickSession => {
+                    db.getKicks(kickSession.id, addKicksToKickSession.bind({kickSession: kickSession})); //check this, it might not need to wait to respond
+                });
                 response.status(200).json(kickSessions);
             }
         });
@@ -85,10 +82,7 @@ module.exports = {
 
         // TODO: We should really check here for a valid id before continuing on...
         db.getKicks(kickSessionId, function (error, result) {
-            // This is the callback function that will be called when the DB is done.
-            // The job here is just to send it back.
 
-            // Make sure we got a row with the person, then prepare JSON to send back
             if (error || result == null) {
                 response.status(500).json({success: false, data: error});
             } else {
@@ -107,8 +101,6 @@ module.exports = {
         bcrypt.hash(request.body.password, 10, (err, password) => {
             // Store hash in database
             db.createMother(username, password, function (error, result) {
-                // This is the callback function that will be called when the DB is done.
-                // The job here is just to send it back.
 
                 // Make sure we got a row with the person, then prepare JSON to send back
                 if (error || result == null) {
@@ -122,10 +114,50 @@ module.exports = {
 
     },
     createKickSession: function (request, response) {
+        const startTime = request.body.startTime;
+        const motherId = request.body.motherId; //or from cookies?
 
+        // Store hash in database
+        db.createKickSession(startTime, motherId, function (error, result) {
+
+            // Make sure we got a row with the person, then prepare JSON to send back
+            if (error || result == null) {
+                response.status(500).json({success: false, data: error});
+            } else {
+                const kickSession = result.rows[0];
+                db.createKick(startTime, kickSession.id, addKicksToKickSession.bind({response: response, kickSession: kickSession}));
+            }
+        });
     },
     createKick: function (request, response) {
+        const time = request.body.time;
+        const kickSessionId = request.body.kickSessionId; //or from cookies?
 
+        // Store hash in database
+        db.createKick(time, kickSessionId, function (error, result) {
+
+            // Make sure we got a row with the person, then prepare JSON to send back
+            if (error || result == null) {
+                response.status(500).json({success: false, data: error});
+            } else {
+                const kick = result.rows[0];
+                response.status(200).json(kick);
+            }
+        });
     }
 
 };
+
+function addKicksToKickSession(error, result) {
+    if (result !== null) {
+        this.kickSession.kicks = result.rows;
+    }
+    if (this.response) {
+        if (error || result == null) {
+            this.response.status(500).json({success: false, data: error});
+        } else {
+            this.response.status(200).json(this.kickSession);
+        }
+    }
+
+}

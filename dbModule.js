@@ -48,7 +48,7 @@ module.exports = {
     },
 
     createKick: function (time, kickSessionId, callback) {
-        const query = 'INSERT INTO kick (time, kick_session_id ) VALUES ($1, $2) RETURNING id, time, kick_session_id';
+        const query = 'INSERT INTO kick (time, kick_session_id) VALUES ($1, $2) RETURNING id, time, kick_session_id';
         pool.query(query, [time, kickSessionId], callback);
     }
 };
