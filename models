@@ -6,10 +6,8 @@ module.exports = {
 
     getMother: function (request, response) {
         const username = request.body.username;
-        const password = request.body.password; //hash it
+        const password = request.body.password;
 
-
-            // TODO: We should really check here for a valid id before continuing on...
         db.getMother(username, function (error, result) {
             // This is the callback function that will be called when the DB is done.
             // The job here is just to send it back.
@@ -19,18 +17,18 @@ module.exports = {
                 response.status(500).json({success: false, data: error});
             } else {
                 const mother = result[0];
-                bcrypt.compare(password, mother.password, function(err, res) {
-                    if(res) {
+                bcrypt.compare(password, mother.password, function (err, res) {
+                    if (res) {
                         // Passwords match
                         response.status(200).json(mother); //ok
                     } else {
                         // Passwords don't match
-                        response.status(200).json(); //wrong password
+                        response.status(400).json({success: false, data: "Wrong Username or password"});
                     }
                 });
 
 
-                }
+            }
         });
     },
     getKickSession: function (request, response) {
@@ -107,7 +105,6 @@ module.exports = {
 
     createMother: function (request, response) {
         const username = request.body.username;
-
 
         bcrypt.hash(request.body.password, 10, (err, password) => {
             // Store hash in database

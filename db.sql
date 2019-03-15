@@ -1,6 +1,6 @@
 CREATE TABLE mother (
  id    serial PRIMARY KEY,
- name  varchar(60),
+ username  varchar(60),
  password  varchar(255));
 
 -- INSERT INTO mother (name, password)
