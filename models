@@ -17,15 +17,15 @@ module.exports = {
                 response.status(500).json({success: false, data: error});
             } else {
                 const mother = result[0];
-                bcrypt.compare(password, mother.password, function (err, res) {
-                    if (res) {
+               // bcrypt.compare(password, mother.password, function (err, res) {
+               //      if (res) {
                         // Passwords match
                         response.status(200).json(mother); //ok
-                    } else {
-                        // Passwords don't match
-                        response.status(400).json({success: false, data: "Wrong Username or password"});
-                    }
-                });
+                    // } else {
+                    //     // Passwords don't match
+                    //     response.status(400).json({success: false, data: "Wrong Username or password"});
+                    // }
+              //  });
 
 
             }
@@ -77,7 +77,7 @@ module.exports = {
             if (error || result == null) {
                 response.status(500).json({success: false, data: error});
             } else {
-                const kickSessions = result;
+                const kickSessions = result.rows;
                 response.status(200).json(kickSessions);
             }
         });
@@ -94,7 +94,7 @@ module.exports = {
             if (error || result == null) {
                 response.status(500).json({success: false, data: error});
             } else {
-                const kicks = result;
+                const kicks = result.rows;
                 response.status(200).json(kicks);
             }
         });
@@ -116,7 +116,7 @@ module.exports = {
                 if (error || result == null) {
                     response.status(500).json({success: false, data: error});
                 } else {
-                    const mother = result;
+                    const mother = result.rows[0];
                     response.status(200).json(mother);
                 }
             });
