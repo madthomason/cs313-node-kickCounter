@@ -7,7 +7,7 @@ module.exports = {
     getMother: function (username, callback) {
         const query = 'SELECT id, username, password FROM mother WHERE username = $1';
 
-        pool.query(query, username, callback);
+        pool.query(query, [username], callback);
     },
 
     getKickSession: function (id, callback) {

@@ -14,7 +14,7 @@ CREATE TABLE mother (
    mother_id  	int REFERENCES mother (id));
 
    INSERT INTO kick_session (start_time, end_time, mother_id)
-    VALUES ('2004-10-19 10:23:54', '2004-10-19 10:23:54', (SELECT id FROM person WHERE name = 'Madeline')),
+    VALUES ('2004-10-19 10:23:54', '2004-10-19 10:23:54', (SELECT id FROM person WHERE name = 'madeline')),
     ('2004-10-19 10:23:54', '2004-10-19 10:23:54', (SELECT id FROM person WHERE name = 'Sue')),
     ('2004-10-19 10:23:54', '2004-10-19 10:23:54', (SELECT id FROM person WHERE name = 'Sue'));
 
