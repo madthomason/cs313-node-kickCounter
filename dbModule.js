@@ -6,7 +6,7 @@ const pool = new Pool({connectionString: connectionString});
 //pg config
 const pg = require('pg');
 
-exports = {
+module.exports = {
     getMother: function (username, callback) {
 
     },
@@ -46,5 +46,5 @@ exports = {
 
     createKick: function () {
 
-    },
-}
+    }
+};
