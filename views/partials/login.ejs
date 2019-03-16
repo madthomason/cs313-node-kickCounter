@@ -1,23 +1,23 @@
-<div class="d-flex justify-content-center align-items-center vh-100">
+<div id="loginPage" class="d-flex justify-content-center align-items-center vh-100">
     <div id="login" class="card  w-75 p-3">
-        <form class="form-signin" action="/login" method="post">
+        <form id="form-login">
             <h1 class="form-group">Please login</h1>
             <input type="text" class="form-control form-control-lg form-group" name="username" placeholder="Username"
                    autofocus="" required/>
             <input type="password" class="form-control form-control-lg form-group" name="password" placeholder="Password" required/>
-            <input class="btn btn-lg btn-primary btn-block" type="submit" value="Login">
+            <input class="btn btn-lg btn-primary btn-block" type="submit" value="Login" onclick="loginMother(event)">
         </form>
         <h6>Don't have an account?</h6>
         <button class="btn btn-md btn-primary btn-block" onclick="toggleCards()">Sign Up!</button>
     </div>
 
     <div id="signup" class="card w-75 p-3 d-none">
-        <form class="form-signin" action="/signUp" method="post">
+        <form id="form-signin">
             <h1 class="form-group">Sign Up</h1>
             <input type="text" class="form-control form-control-lg form-group" name="username" placeholder="Username"
                    autofocus="" required/>
             <input type="password" class="form-control form-control-lg form-group" name="password" placeholder="Password" required/>
-            <input class="btn btn-lg btn-primary btn-block" type="submit" value="Sign Up">
+            <input class="btn btn-lg btn-primary btn-block" type="submit" value="Sign Up" onclick="signUpMother()">
         </form>
         <h6>Already have an account?</h6>
         <button class="btn btn-md btn-primary btn-block" onclick="toggleCards()">Login!</button>
