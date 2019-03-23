@@ -11,23 +11,31 @@ module.exports = {
     },
 
     getKickSession: function (id, callback) {
-        const query = 'SELECT id, start_time, end_time, mother_id FROM kick_session WHERE id = $1';
-        pool.query(query, id, callback);
+        const query = 'SELECT ks.id, ks.start_time, ks.end_time, ks.mother_id, json_agg(k.*) as kicks\n' +
+            'FROM kick_session ks\n' +
+            'JOIN kick k ON ks.id = k.kick_session_id\n' +
+            'WHERE ks.id = $1\n' +
+            'GROUP BY ks.id';
+        pool.query(query, [id], callback);
     },
 
     getKick: function (id, callback) {
         const query = 'SELECT id, time, kick_session_id FROM kick WHERE id = $1';
-        pool.query(query, id, callback);
+        pool.query(query, [id], callback);
     },
 
     getKickSessions: function (motherId, callback) {
-        const query = 'SELECT id, start_time, end_time, mother_id FROM kick_session WHERE mother_id = $1';
-        pool.query(query, motherId, callback);
+        const query = 'SELECT ks.id, ks.start_time, ks.end_time, ks.mother_id, json_agg(k.*) as kicks\n' +
+            'FROM kick_session ks\n' +
+            'JOIN kick k ON ks.id = k.kick_session_id\n' +
+            'WHERE ks.mother_id = $1\n' +
+            'GROUP BY ks.id';
+        pool.query(query, [motherId], callback);
     },
 
     getKicks: function (kickSessionId, callback) {
         const query = 'SELECT id, time, kick_session_id FROM kick WHERE kick_session_id = $1';
-        pool.query(query, kickSessionId, callback);
+        pool.query(query, [kickSessionId], callback);
 
     },
 

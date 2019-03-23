@@ -3,7 +3,7 @@ const path = require('path');
 const PORT = process.env.PORT || 5000;
 const router = express.Router();
 const bodyParser = require('body-parser');
-const model = require('./models');
+const controller = require('./controller.js');
 
 express()
   .use(express.static(path.join(__dirname, 'public')))
@@ -15,17 +15,17 @@ express()
   .set('view engine', 'ejs')
   .get('/', (req, res) => res.render('pages/kickCounter'))
 
-    .post('/login', model.getMother)
-    .post('/signUp', model.createMother)
+    .post('/login', controller.getMother)
+    .post('/signUp', controller.createMother)
 
-    .get('/kick/:kickId', model.getKick)
-    .post('/kick', model.createKick)
-    .get('/kickSession/kick/:kickSessionId', model.getKicks)
+    .get('/kick/:kickId', controller.getKick)
+    .post('/kick', controller.createKick)
+    .get('/kickSession/kick/:kickSessionId', controller.getKicks)
 
-    .get('/kickSession/:kickSessionId', model.getKickSession)
-    .put('/kickSession/:kickSessionId', model.updateKickSession)
-    .post('/kickSession', model.createKickSession)
-    .get('/kickSessions/:motherId', model.getKickSessions)
+    .get('/kickSession/:kickSessionId', controller.getKickSession)
+    .put('/kickSession/:kickSessionId', controller.updateKickSession)
+    .post('/kickSession', controller.createKickSession)
+    .get('/kickSessions/:motherId', controller.getKickSessions)
     .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
 

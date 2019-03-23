@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
-const db = require('./dbModule.js');
+const db = require('./dbModel.js');
+const { forEach } = require('p-iteration');
 
 
 module.exports = {
@@ -27,28 +28,32 @@ module.exports = {
             }
         });
     },
+
     getKickSession: function (request, response) {
         const kickSessionId = request.param.kickSessionId;
 
-        // TODO: We should really check here for a valid id before continuing on...
+        if (isNaN(kickSessionId)) {
+            response.status(500).json({success: false, data: "Invalid kickSessionId"});
+        }
         db.getKickSession(kickSessionId, function (error, result) {
 
-            // Make sure we got a row with the person, then prepare JSON to send back
             if (error || result == null || result.rows.length !== 1) {
                 response.status(500).json({success: false, data: error});
             } else {
                 const kickSession = result.rows[0];
+                kickSession.kicks = [];
                 db.getKicks(kickSessionId, addKicksToKickSession.bind({response: response, kickSession: kickSession}));
             }
         });
     },
     getKick: function (request, response) {
-        const kickId = request.query.kickId;
+        const kickId = request.params.kickId;
 
-        // TODO: We should really check here for a valid id before continuing on...
+        if (isNaN(kickId)) {
+            response.status(500).json({success: false, data: "Invalid kickId"});
+        }
         db.getKick(kickId, function (error, result) {
 
-            // Make sure we got a row with the person, then prepare JSON to send back
             if (error || result == null || result.rows.length !== 1) {
                 response.status(500).json({success: false, data: error});
             } else {
@@ -58,29 +63,24 @@ module.exports = {
         });
     },
     getKickSessions: function (request, response) {
-        const motherId = request.query.motherId;
+        const motherId = request.params.motherId;
 
-        // TODO: We should really check here for a valid id before continuing on...
         db.getKickSessions(motherId, function (error, result) {
-            // This is the callback function that will be called when the DB is done.
-            // The job here is just to send it back.
-
-            // Make sure we got a row with the person, then prepare JSON to send back
-            if (error || result == null) {
+            if (error || result === null) {
                 response.status(500).json({success: false, data: error});
             } else {
                 const kickSessions = result.rows;
-                kickSessions.forEach(kickSession => {
-                    db.getKicks(kickSession.id, addKicksToKickSession.bind({kickSession: kickSession})); //check this, it might not need to wait to respond
-                });
                 response.status(200).json(kickSessions);
             }
         });
+
     },
     getKicks: function (request, response) {
-        const kickSessionId = request.query.kickSessionId;
+        const kickSessionId = request.params.kickSessionId;
 
-        // TODO: We should really check here for a valid id before continuing on...
+        if (isNaN(kickSessionId)) {
+            response.status(500).json({success: false, data: "Invalid kickSessionId"});
+        }
         db.getKicks(kickSessionId, function (error, result) {
 
             if (error || result == null) {
@@ -92,7 +92,21 @@ module.exports = {
         });
     },
     updateKickSession: function (request, response) {
+        const kickSessionId = request.params.kickSessionId;
+        const endTime = request.params.endTime;
 
+        if (isNaN(kickSessionId)) {
+            response.status(500).json({success: false, data: "Invalid kickSessionId cannot update"});
+        }
+        db.updateKickSession(kickSessionId, endTime, function (error, result) {
+
+            if (error || result == null) {
+                response.status(500).json({success: false, data: error});
+            } else {
+                const kickSession = result.rows;
+                response.status(200).json(kickSession);
+            }
+        });
     },
 
     createMother: function (request, response) {
@@ -125,7 +139,11 @@ module.exports = {
                 response.status(500).json({success: false, data: error});
             } else {
                 const kickSession = result.rows[0];
-                db.createKick(startTime, kickSession.id, addKicksToKickSession.bind({response: response, kickSession: kickSession}));
+                kickSession.kicks = [];
+                db.createKick(startTime, kickSession.id, addKicksToKickSession.bind({
+                    response: response,
+                    kickSession: kickSession
+                }));
             }
         });
     },
@@ -133,7 +151,6 @@ module.exports = {
         const time = request.body.time;
         const kickSessionId = request.body.kickSessionId; //or from cookies?
 
-        // Store hash in database
         db.createKick(time, kickSessionId, function (error, result) {
 
             // Make sure we got a row with the person, then prepare JSON to send back
@@ -149,15 +166,20 @@ module.exports = {
 };
 
 function addKicksToKickSession(error, result) {
-    if (result !== null) {
-        this.kickSession.kicks = result.rows;
+    if (error || result === null) {
+        return [];
+    } else {
+        return result.rows;
     }
-    if (this.response) {
-        if (error || result == null) {
-            this.response.status(500).json({success: false, data: error});
-        } else {
-            this.response.status(200).json(this.kickSession);
-        }
-    }
+    // if (result !== null) {
+    //     this.kickSession.kicks = result.rows;
+    // }
+    // if (this.response) {
+    //     if (error || result === null) {
+    //         this.response.status(500).json({success: false, data: error});
+    //     } else {
+    //         this.response.status(200).json(this.kickSession);
+    //     }
+    // }
 
 }

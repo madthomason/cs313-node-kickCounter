@@ -13,9 +13,11 @@
   "dependencies": {
     "bcrypt": "^3.0.4",
     "body-parser": "^1.18.3",
+    "chart.js": "^2.8.0",
     "dotenv": "^6.2.0",
     "ejs": "^2.5.6",
     "express": "^4.15.2",
+    "p-iteration": "^1.1.8",
     "pg": "^7.8.2"
   },
   "devDependencies": {
