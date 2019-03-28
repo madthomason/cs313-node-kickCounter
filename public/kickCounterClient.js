@@ -87,11 +87,51 @@ function goToMain(json) {
 
 }
 
+function goToKickSession(json) {
+    //TODO: Check header status code
+    console.log("back from server with: ");
+    console.log(json);
+    console.log(this.response);
+    if (!this.response.success) {
+        togglePages("login");
+        alert(this.response.data);
+    } else {
+        const kickSession = this.response;
+        document.getElementById("startTime").innerHTML = kickSession.start_time;
+        const kickList = document.getElementById("kicksContainer");
+
+        let kickNum = 1;
+        let kicksHtml = '';
+        kickSession.kicks.forEach(kick => {
+            kicksHtml +=
+                '<div class="d-flex flex-column">\n' +
+                '   <div class="d-flex ">\n' +
+                `      <h3>Kick #${kickNum}</h3> - <h3>${kick.time}</h3>\n` +
+                '   </div>\n' +
+                '</div><hr></div>\n';
+            kickNum++;
+        });
+        kickList.innerHTML = kicksHtml;
+    }
+    togglePages("kickCounter");
+}
+
 function loginMother(event) {
     event.preventDefault();
     const form = document.querySelector('#form-login');
     const formData = serialize(form);
     doAjaxCall('POST', formData, '/login', true, goToMain);
+}
+
+function logout() {
+    doAjaxCall('GET', null, '/logout', true, function (response) {
+        if (response.success) {
+            togglePages('login');
+        } else {
+            console.error('error in session');
+            togglePages('login');
+        }
+    });
 }
 
 function signUpMother() {
@@ -103,6 +143,10 @@ function signUpMother() {
 
 function getKickSessions(motherId, callback) {
     doAjaxCall('GET', null, '/kickSessions/' + motherId, false, callback);
+}
+
+function createKickSession() {
+    doAjaxCall('POST', null, '/kickSessions/', false, goToKickSession());
 }
 
 function doAjaxCall(method, data, url, form, callback) {
@@ -170,7 +214,7 @@ function getData(kicks) {
     });
     let minutesAgg = [];
     let labels = [];
-    for (let i  = min; i <= max; i++) {
+    for (let i = min; i <= max; i++) {
         labels.push(i);
         minutesAgg.push(minutes.filter(minute => minute === i).length);
     }

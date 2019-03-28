@@ -50,9 +50,9 @@ module.exports = {
         pool.query(query, [username, password], callback);
     },
 
-    createKickSession: function (startTime, motherId, callback) {
-        const query = 'INSERT INTO kick_session (start_time, mother_id ) VALUES ($1, $2) RETURNING id, start_time, end_time, mother_id ';
-        pool.query(query, [startTime, motherId], callback);
+    createKickSession: function (motherId, callback) {
+        const query = 'INSERT INTO kick_session (start_time, mother_id ) VALUES (CURRENT_TIMESTAMP, $1) RETURNING id, start_time, end_time, mother_id ';
+        pool.query(query, [motherId], callback);
     },
 
     createKick: function (time, kickSessionId, callback) {

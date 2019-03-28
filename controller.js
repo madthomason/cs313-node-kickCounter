@@ -22,11 +22,22 @@ module.exports = {
                         response.status(200).json(mother); //ok
                     } else {
                         // Passwords don't match
+
+                        //TODO: Set mother to session
                         response.status(400).json({success: false, data: "Wrong Username or password"});
                     }
                 });
             }
         });
+    },
+
+    logout: function (request, response) {
+        if (request.session.mother) {
+            request.session.destroy();
+            request.json({success: true});
+        } else {
+            request.json({success: false});
+        }
     },
 
     getKickSession: function (request, response) {
@@ -121,6 +132,8 @@ module.exports = {
                     response.status(500).json({success: false, data: error});
                 } else {
                     const mother = result.rows[0];
+                    //TODO: Set motherId to session
+                    request.session.mother = mother;
                     response.status(200).json(mother);
                 }
             });
@@ -128,11 +141,11 @@ module.exports = {
 
     },
     createKickSession: function (request, response) {
-        const startTime = request.body.startTime;
-        const motherId = request.body.motherId; //or from cookies?
+        //TODO: Get motherId from session, if not there send them back to login
+        const motherId = request.session.mother.id;
 
         // Store hash in database
-        db.createKickSession(startTime, motherId, function (error, result) {
+        db.createKickSession(motherId, function (error, result) {
 
             // Make sure we got a row with the person, then prepare JSON to send back
             if (error || result == null) {
@@ -140,10 +153,14 @@ module.exports = {
             } else {
                 const kickSession = result.rows[0];
                 kickSession.kicks = [];
-                db.createKick(startTime, kickSession.id, addKicksToKickSession.bind({
-                    response: response,
-                    kickSession: kickSession
-                }));
+                db.createKick(kickSession.start_time, kickSession.id, function (error, result) {
+                    if (error || result == null) {
+                        response.status(500).json({success: false, data: error});
+                    } else {
+                        kickSession.kicks = result.rows;
+                        response.status(200).json(kickSession);
+                    }
+                });
             }
         });
     },
