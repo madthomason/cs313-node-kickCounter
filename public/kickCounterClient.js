@@ -45,7 +45,7 @@ function goToMain(json) {
     console.log("back from server with: ");
     console.log(json);
     console.log(this.response);
-    if (this.response.success === false) {
+    if (this.response.statusCode >= 400) {
         togglePages("login");
         alert(this.response.data);
     } else {
@@ -92,7 +92,7 @@ function goToKickSession(json) {
     console.log("back from server with: ");
     console.log(json);
     console.log(this.response);
-    if (!this.response.success) {
+    if (this.response.statusCode >= 400) {
         togglePages("login");
         alert(this.response.data);
     } else {
@@ -104,8 +104,8 @@ function goToKickSession(json) {
         let kicksHtml = '';
         kickSession.kicks.forEach(kick => {
             kicksHtml +=
-                '<div class="d-flex flex-column">\n' +
-                '   <div class="d-flex ">\n' +
+                `<div class="d-flex flex-column kicks" id="${kickNum}" >\n` +
+                '   <div class="d-flex justify-content-around">\n' +
                 `      <h3>Kick #${kickNum}</h3> - <h3>${kick.time}</h3>\n` +
                 '   </div>\n' +
                 '</div><hr></div>\n';
@@ -114,6 +114,29 @@ function goToKickSession(json) {
         kickList.innerHTML = kicksHtml;
     }
     togglePages("kickCounter");
+}
+
+function updateKickSession(json) {
+    //TODO: Check header status code
+    console.log("back from server with: ");
+    console.log(json);
+    console.log(this.response);
+    if (this.response.statusCode >= 400) {
+        togglePages("login");
+        alert(this.response.data);
+    } else {
+        const kick = this.response;
+        const kickList = document.getElementsByClassName("kicks");
+        let kickNum = +kickList.item(kickList.length - 1).id + 1;
+        let kicksHtml =
+                `<div class="d-flex flex-column kicks" id="${kickNum}" >\n` +
+                '   <div class="d-flex justify-content-around">\n' +
+                `      <h3>Kick #${kickNum}</h3><h3>${kick.time}</h3>\n` +
+                '   </div>\n' +
+                '</div><hr></div>\n';
+
+        document.getElementById("kicksContainer").innerHTML += kicksHtml;
+    }
 }
 
 function loginMother(event) {
@@ -125,7 +148,7 @@ function loginMother(event) {
 
 function logout() {
     doAjaxCall('GET', null, '/logout', true, function (response) {
-        if (response.success) {
+        if (this.response.success) {
             togglePages('login');
         } else {
             console.error('error in session');
@@ -146,7 +169,15 @@ function getKickSessions(motherId, callback) {
 }
 
 function createKickSession() {
-    doAjaxCall('POST', null, '/kickSessions/', false, goToKickSession());
+    doAjaxCall('POST', null, '/kickSession', false, goToKickSession);
+}
+
+function finishKickSession() {
+    doAjaxCall('POST', null, '/end/kickSession', false, goToMain);
+}
+
+function createKick() {
+    doAjaxCall('POST', null, '/kick', false, updateKickSession);
 }
 
 function doAjaxCall(method, data, url, form, callback) {
@@ -206,7 +237,7 @@ function getKickSessionGraph(kicks, ctxId) {
 
 function getData(kicks) {
     const min = new Date(kicks[0].time).getMinutes();
-    const max = new Date(kicks[kicks.length].time).getMinutes();
+    const max = new Date(kicks[kicks.length - 1].time).getMinutes();
     let minutes = [];
 
     kicks.forEach(kick => {

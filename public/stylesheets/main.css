@@ -25,3 +25,8 @@
     .jumbotron .lang-logo img {
       max-width: 100%; }
 
+    .vh100 {
+      min-height: 100vh!important;
+    }
+
+

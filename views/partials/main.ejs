@@ -1,7 +1,7 @@
-<div id="main" class="flex-column justify-content-center align-items-center vh-100 d-none">
+<div id="main" class="flex-column justify-content-center align-items-center vh100 d-none overflow-auto">
     <button onclick="logout()">logout</button>
         <h1 class="display-1"> Welcome <span id="motherName"></span>!</h1>
-        <button class="btn btn-secondary btn-lg" disabled>Start Kick Session!</button>
+        <button class="btn btn-secondary btn-lg" onclick="createKickSession()">Start Kick Session!</button>
     <h3 class="display-2">Previous Sessions</h3>
     <hr>
     <div id="kickSessionList"></div>

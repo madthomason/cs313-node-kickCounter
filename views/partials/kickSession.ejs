@@ -1,14 +1,11 @@
-<div id="kickCounterPage" class="justify-content-center align-items-center vh-100 d-none">
+<div id="kickCounterPage" class="justify-content-center align-items-center vh100 d-none">
     <div class="d-flex flex-column">
         <h1 class="display-1">Session Start <span id="startTime"></span></h1>
-        <button id="kickButton">Felt Kick</button>
-        <button id="stopButton">Stop Session</button>
+        <button class="btn btn-secondary btn-lg m-1"  id="kickButton" onclick="createKick()">Felt Kick</button>
+        <button class="btn btn-secondary btn-lg m-1"  id="stopButton" onclick="finishKickSession()">Stop Session</button>
         <h1 class="display-1">Kicks: <span id="kickCount"></span></h1>
         <div id="kicksContainer">
         <!--for each kick-->
-            <div class="">
-
-            </div>
         </div>
     </div>
 </div>

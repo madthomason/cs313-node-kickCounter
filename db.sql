@@ -37,5 +37,6 @@ JOIN kick k ON ks.id = k.kick_session_id
 WHERE ks.id = 1
 GROUP BY ks.id;
 
-
-  1 | 2004-10-19 10:23:54 | 2004-10-19 11:23:54 |         1 | {"(1,\"2004-10-19 10:23:54\",1)","(2,\"2004-10-19 10:24:54\",1)","(3,\"2004-10-19 10:25:54\",1)","(4,\"2004-10-19 10:26:54\",1)","(5,\"2004-10-19 10:27:54\",1)","(6,\"2004-10-19 10:28:54\",1)","(7,\"2004-10-19 10:29:54\",1)","(8,\"2004-10-19 10:40:54\",1)","(9,\"2004-10-19 10:41:54\",1)","(10,\"2004-10-19 10:42:54\",1)"}
+-- For dev cleanup purposes
+--DELETE FROM kick WHERE kick_session_id IN (SELECT id FROM kick_session WHERE end_time IS NULL);
+--DELETE FROM kick_session WHERE end_time IS NULL;

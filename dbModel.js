@@ -39,9 +39,9 @@ module.exports = {
 
     },
 
-    updateKickSession: function (kickSessionId, endTime, callback) {
-        const query = 'UPDATE kick_session SET end_time = $1 WHERE id = $2 RETURNING id, start_time, end_time, mother_id ';
-        pool.query(query, [endTime, kickSessionId], callback);
+    updateKickSession: function (kickSessionId, callback) {
+        const query = 'UPDATE kick_session SET end_time = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id, start_time, end_time, mother_id ';
+        pool.query(query, [kickSessionId], callback);
     },
 
     createMother: function (username, password, callback) {
@@ -56,7 +56,14 @@ module.exports = {
     },
 
     createKick: function (time, kickSessionId, callback) {
-        const query = 'INSERT INTO kick (time, kick_session_id) VALUES ($1, $2) RETURNING id, time, kick_session_id';
-        pool.query(query, [time, kickSessionId], callback);
+
+        if (time === null) {
+            let query = 'INSERT INTO kick (time, kick_session_id) VALUES (CURRENT_TIMESTAMP, $1) RETURNING id, time, kick_session_id';
+            pool.query(query, [kickSessionId], callback);
+        } else {
+            let query = 'INSERT INTO kick (time, kick_session_id) VALUES ($1, $2) RETURNING id, time, kick_session_id';
+            pool.query(query, [time, kickSessionId], callback);
+        }
+
     }
 };

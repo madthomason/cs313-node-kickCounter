@@ -30,7 +30,7 @@ express()
     .get('/kickSession/kick/:kickSessionId', controller.getKicks)
 
     .get('/kickSession/:kickSessionId', controller.getKickSession)
-    .put('/kickSession/:kickSessionId', controller.updateKickSession)
+    .post('/end/kickSession', controller.updateKickSession)
     .post('/kickSession', controller.createKickSession)
     .get('/kickSessions/:motherId', controller.getKickSessions)
     .listen(PORT, () => console.log(`Listening on ${ PORT }`));
