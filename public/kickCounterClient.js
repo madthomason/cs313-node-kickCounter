@@ -24,6 +24,7 @@ function togglePages(page) {
             kickCounter.classList.add("d-none");
             break;
         case "kickCounter":
+            kickCounter.classList.add("d-flex");
             kickCounter.classList.remove("d-none");
             login.classList.add("d-none");
             login.classList.remove("d-flex");
@@ -66,15 +67,15 @@ function goToMain(json) {
                 kickSessions.forEach(k => {
                     const disabled = ((k.kicks === [] || k.kicks.length === 1) ? 'disabled' : '');
                     kickSessionHtml +=
-                        '<div class="d-flex flex-column">\n' +
-                        '            <div class="d-flex ">\n' +
-                        `               <h3>${new Date(k.start_time).toDateString()}</h3> - <h3>Kicks: ${k.kicks.length}</h3>\n` +
-                        `<button onclick="getKickSessionGraph(${k.kicks}, myChart${k.id})" ${disabled}><i class="fas fa-chevron-down"></i></button>` +
+                        '<div class="d-flex flex-column vw100">\n' +
+                        '            <div class="d-flex justify-content-around">\n' +
+                        `               <h3>${new Date(k.start_time).toDateString()}</h3><h3>Kicks: ${k.kicks.length}</h3>\n` +
+                        `<button onclick="getKickSessionGraph([${k.kicks}], myChart${k.id})" ${disabled} class="btn btn-secondary"><i class="fas fa-chevron-down"></i></button>` +
                         '            </div>\n' +
-                        '            <div class="d-flex ">\n' +
+                        '            <div class="d-flex ml-3">\n' +
                         `                <h3>Duration: ${getDuration(k.end_time, k.start_time)}</h3>\n` +
                         '            </div>\n' +
-                        '<div id="kickSessionGraph" class="d-flex"><canvas id=`myChart${k.id}` width="400" height="400"></canvas>' +
+                        '<div id="kickSessionGraph" class="collapse"><canvas id=`myChart${k.id}` width="400" height="400"></canvas>' +
                         '</div><hr></div>\n';
                 });
 
@@ -88,7 +89,6 @@ function goToMain(json) {
 }
 
 function goToKickSession(json) {
-    //TODO: Check header status code
     console.log("back from server with: ");
     console.log(json);
     console.log(this.response);
@@ -97,16 +97,21 @@ function goToKickSession(json) {
         alert(this.response.data);
     } else {
         const kickSession = this.response;
-        document.getElementById("startTime").innerHTML = kickSession.start_time;
+        const isoStart = moment(kickSession.start_time);
+        const zone = isoStart.zone()/60;
+        let start_time =  isoStart.subtract(zone, 'hours');
+        document.getElementById("startTime").innerHTML = start_time.format('MMM DD YYYY h:mm:ss:SSS a');
         const kickList = document.getElementById("kicksContainer");
 
         let kickNum = 1;
         let kicksHtml = '';
         kickSession.kicks.forEach(kick => {
+            let isoTime = moment(kick.time);
+            let time = isoTime.subtract(zone, 'hours');
             kicksHtml +=
                 `<div class="d-flex flex-column kicks" id="${kickNum}" >\n` +
                 '   <div class="d-flex justify-content-around">\n' +
-                `      <h3>Kick #${kickNum}</h3> - <h3>${kick.time}</h3>\n` +
+                `      <h3>Kick #${kickNum}</h3><h3>${time.format('h:mm:ss:SSS a')}</h3>\n` +
                 '   </div>\n' +
                 '</div><hr></div>\n';
             kickNum++;
@@ -194,10 +199,13 @@ function doAjaxCall(method, data, url, form, callback) {
 }
 
 function getKickSessionGraph(kicks, ctxId) {
+
     let data = getData(kicks);
     console.log(data);
-    let ctx = document.getElementById(ctxId).getContext('2d');
-    let myChart = new Chart(ctx, {
+    const collapseDiv = document.getElementById(ctxId);
+    collapseDiv.classList.toggle('collapse');
+
+    let myChart = new Chart(collapseDiv.getContext('2d'), {
         type: 'line',
         data: {
             labels: data.labels,

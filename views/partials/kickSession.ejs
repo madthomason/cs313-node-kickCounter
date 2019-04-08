@@ -1,11 +1,18 @@
-<div id="kickCounterPage" class="justify-content-center align-items-center vh100 d-none">
-    <div class="d-flex flex-column">
-        <h1 class="display-1">Session Start <span id="startTime"></span></h1>
-        <button class="btn btn-secondary btn-lg m-1"  id="kickButton" onclick="createKick()">Felt Kick</button>
-        <button class="btn btn-secondary btn-lg m-1"  id="stopButton" onclick="finishKickSession()">Stop Session</button>
-        <h1 class="display-1">Kicks: <span id="kickCount"></span></h1>
-        <div id="kicksContainer">
-        <!--for each kick-->
+<div id="kickCounterPage" class="flex-column align-items-center vh100 d-none overflow-auto">
+    <div class="d-flex justify-content-around flex-column align-items-center">
+        <h1 class="display-3">Session Start </h1>
+        <h1 class="display-4 text-center" id="startTime"></h1>
+        <div class="d-flex flex-column">
+            <button class="btn btn-secondary btn-lg m-1 w-100" id="kickButton" onclick="createKick()">Felt Kick</button>
+            <button class="btn btn-secondary btn-lg m-1 w-100" id="stopButton" onclick="finishKickSession()">Stop
+                Session
+            </button>
         </div>
+
+        <h1 class="display-4">Kicks<span id="kickCount"></span></h1>
+    </div>
+    <hr>
+    <div id="kicksContainer">
+        <!--for each kick-->
     </div>
 </div>

@@ -28,5 +28,20 @@
     .vh100 {
       min-height: 100vh!important;
     }
+    .vw100 {
+      width: 100vw!important;
+    }
+.vh50 {
+  height: 50vh!important;
+}
+
+hr {
+  border: solid 1px black;
+  width: 100vw;
+}
+
+html {
+  font-size: 36px;
+}
 
 

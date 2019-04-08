@@ -1,8 +1,12 @@
 <div id="main" class="flex-column justify-content-center align-items-center vh100 d-none overflow-auto">
-    <button onclick="logout()">logout</button>
-        <h1 class="display-1"> Welcome <span id="motherName"></span>!</h1>
+    <div class="d-flex vw100 justify-content-end">
+        <button class="btn btn-secondary btn-sm m-2" onclick="logout()">logout</button>
+    </div>
+    <div class="flex-column justify-content-around align-items-center d-flex vh50">
+        <h1 class="display-3 text-center"> Welcome <span id="motherName"></span>!</h1>
         <button class="btn btn-secondary btn-lg" onclick="createKickSession()">Start Kick Session!</button>
-    <h3 class="display-2">Previous Sessions</h3>
+    <h3 class="display-4">Previous Sessions</h3>
+    </div>
     <hr>
     <div id="kickSessionList"></div>
 </div>
