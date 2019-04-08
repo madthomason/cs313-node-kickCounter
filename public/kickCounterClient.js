@@ -70,13 +70,12 @@ function goToMain(json) {
                         '<div class="d-flex flex-column vw100">\n' +
                         '            <div class="d-flex justify-content-around">\n' +
                         `               <h3>${new Date(k.start_time).toDateString()}</h3><h3>Kicks: ${k.kicks.length}</h3>\n` +
-                        `<button onclick="getKickSessionGraph([${k.kicks}], myChart${k.id})" ${disabled} class="btn btn-secondary"><i class="fas fa-chevron-down"></i></button>` +
+                        `<button onclick='getKickSessionGraph(${k.id})' ${disabled} class="btn btn-secondary"><i class="fas fa-chevron-down"></i></button>` +
                         '            </div>\n' +
                         '            <div class="d-flex ml-3">\n' +
                         `                <h3>Duration: ${getDuration(k.end_time, k.start_time)}</h3>\n` +
-                        '            </div>\n' +
-                        '<div id="kickSessionGraph" class="collapse"><canvas id=`myChart${k.id}` width="400" height="400"></canvas>' +
-                        '</div><hr></div>\n';
+                        `            </div><canvas id='myChart${k.id}' width="400" height="400" class="d-none m-2"></canvas>` +
+                        '<hr></div>\n';
                 });
 
                 kickSessionList.innerHTML = kickSessionHtml;
@@ -98,8 +97,8 @@ function goToKickSession(json) {
     } else {
         const kickSession = this.response;
         const isoStart = moment(kickSession.start_time);
-        const zone = isoStart.zone()/60;
-        let start_time =  isoStart.subtract(zone, 'hours');
+        const zone = isoStart.zone() / 60;
+        let start_time = isoStart.subtract(zone, 'hours');
         document.getElementById("startTime").innerHTML = start_time.format('MMM DD YYYY h:mm:ss:SSS a');
         const kickList = document.getElementById("kicksContainer");
 
@@ -133,12 +132,14 @@ function updateKickSession(json) {
         const kick = this.response;
         const kickList = document.getElementsByClassName("kicks");
         let kickNum = +kickList.item(kickList.length - 1).id + 1;
+        let isoTime = moment(kick.time);
+        let time = isoTime.subtract(zone, 'hours');
         let kicksHtml =
-                `<div class="d-flex flex-column kicks" id="${kickNum}" >\n` +
-                '   <div class="d-flex justify-content-around">\n' +
-                `      <h3>Kick #${kickNum}</h3><h3>${kick.time}</h3>\n` +
-                '   </div>\n' +
-                '</div><hr></div>\n';
+            `<div class="d-flex flex-column kicks" id="${kickNum}" >\n` +
+            '   <div class="d-flex justify-content-around">\n' +
+            `      <h3>Kick #${kickNum}</h3><h3>${time.format('h:mm:ss:SSS a')}</h3>\n` +
+            '   </div>\n' +
+            '</div><hr></div>\n';
 
         document.getElementById("kicksContainer").innerHTML += kicksHtml;
     }
@@ -198,71 +199,96 @@ function doAjaxCall(method, data, url, form, callback) {
     xhr.send(data);
 }
 
-function getKickSessionGraph(kicks, ctxId) {
-
-    let data = getData(kicks);
-    console.log(data);
-    const collapseDiv = document.getElementById(ctxId);
-    collapseDiv.classList.toggle('collapse');
-
-    let myChart = new Chart(collapseDiv.getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: data.labels,
-            datasets: [{
-                label: 'Kicks per Minute',
-                data: data.data,
-                // backgroundColor: [
-                //     'rgba(255, 99, 132, 0.2)',
-                //     'rgba(54, 162, 235, 0.2)',
-                //     'rgba(255, 206, 86, 0.2)',
-                //     'rgba(75, 192, 192, 0.2)',
-                //     'rgba(153, 102, 255, 0.2)',
-                //     'rgba(255, 159, 64, 0.2)'
-                // ],
-                // borderColor: [
-                //     'rgba(255, 99, 132, 1)',
-                //     'rgba(54, 162, 235, 1)',
-                //     'rgba(255, 206, 86, 1)',
-                //     'rgba(75, 192, 192, 1)',
-                //     'rgba(153, 102, 255, 1)',
-                //     'rgba(255, 159, 64, 1)'
-                // ],
-                // borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
+function getKickSessionGraph(kickSessionId) {
+    const collapseDiv = document.getElementById('myChart' + kickSessionId);
+    if (!collapseDiv.classList.contains('d-none')) {
+        collapseDiv.classList.add('d-none');
+    } else {
+        getData(kickSessionId, function (err, data) {
+            if (err) {
+                console.error(err);
+            } else {
+                console.log('myChart' + kickSessionId);
+                const collapseDiv = document.getElementById('myChart' + kickSessionId);
+                collapseDiv.classList.remove('d-none');
+ console.log(data);
+                let myChart = new Chart(collapseDiv.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Kicks per Minute',
+                            data: data.data,
+                            // backgroundColor: [
+                            //     'rgba(255, 99, 132, 0.2)',
+                            //     'rgba(54, 162, 235, 0.2)',
+                            //     'rgba(255, 206, 86, 0.2)',
+                            //     'rgba(75, 192, 192, 0.2)',
+                            //     'rgba(153, 102, 255, 0.2)',
+                            //     'rgba(255, 159, 64, 0.2)'
+                            // ],
+                            // borderColor: [
+                            //     'rgba(255, 99, 132, 1)',
+                            //     'rgba(54, 162, 235, 1)',
+                            //     'rgba(255, 206, 86, 1)',
+                            //     'rgba(75, 192, 192, 1)',
+                            //     'rgba(153, 102, 255, 1)',
+                            //     'rgba(255, 159, 64, 1)'
+                            // ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    max: data.height + 1
+                                }
+                            }]
+                        }
                     }
-                }]
+                });
             }
-        }
-    });
+        });
+    }
 }
 
-function getData(kicks) {
-    const min = new Date(kicks[0].time).getMinutes();
-    const max = new Date(kicks[kicks.length - 1].time).getMinutes();
-    let minutes = [];
+function getData(kickSessionId, callback) {
 
-    kicks.forEach(kick => {
-        minutes.push(new Date(kick.time).getMinutes());
+    doAjaxCall('GET', null, '/kickSession/kick/' + kickSessionId, false, function () {
+        if (this.response.statusCode >= 400) {
+            callback(this.response.success, this.response.data);
+        } else {
+            const kicks = this.response;
+            const min = new Date(kicks[0].time).getMinutes();
+            const max = new Date(kicks[kicks.length - 1].time).getMinutes();
+            let minutes = [];
+
+            kicks.forEach(kick => {
+                minutes.push(new Date(kick.time).getMinutes());
+            });
+            let minutesAgg = [];
+            let labels = [];
+            let maxLength = 0;
+            for (let i = min; i <= max; i++) {
+                labels.push(i - min);
+                let num = minutes.filter(minute => minute === i).length;
+                minutesAgg.push(num);
+                if (num > maxLength) {
+                   maxLength = num;
+                }
+            }
+            callback(null, {
+                min: min,
+                max: max,
+                labels: labels,
+                data: minutesAgg,
+                height: maxLength
+            });
+        }
     });
-    let minutesAgg = [];
-    let labels = [];
-    for (let i = min; i <= max; i++) {
-        labels.push(i);
-        minutesAgg.push(minutes.filter(minute => minute === i).length);
-    }
-    return {
-        min: min,
-        max: max,
-        labels: labels,
-        data: minutesAgg
-    };
+
 }
 
 /*!

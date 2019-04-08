@@ -87,7 +87,7 @@ module.exports = {
     },
 
     getKicks: function (request, response) {
-        const kickSessionId = request.session.kickSession === null ? request.params.kickSessionId : request.session.kickSession.id;
+        const kickSessionId = request.session.kickSession == null ? request.params.kickSessionId : request.session.kickSession.id;
 
         if (isNaN(kickSessionId)) {
             response.status(500).json({success: false, data: "Invalid kickSessionId"});
@@ -114,6 +114,7 @@ module.exports = {
                 response.status(500).json({success: false, data: error});
             } else {
                 const kickSession = result.rows[0];
+                request.session.kickSession = undefined;
                 if (request.session.mother){
                 response.status(200).json(request.session.mother);
                 } else {
