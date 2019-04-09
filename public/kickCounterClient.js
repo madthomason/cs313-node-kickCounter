@@ -50,7 +50,7 @@ function goToMain(json) {
     console.log("back from server with: ");
     console.log(json);
     console.log(this.response);
-    if (this.response.statusCode >= 400) {
+    if (this.response.statusCode >= 400 || this.response.success === false) {
         togglePages("login");
         alert(this.response.data);
     } else {
