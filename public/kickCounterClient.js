@@ -14,7 +14,9 @@ function togglePages(page) {
             login.classList.remove("d-none");
             login.classList.add("d-flex");
             main.classList.add("d-none");
+            main.classList.remove("d-flex");
             kickCounter.classList.add("d-none");
+            kickCounter.classList.remove("d-flex");
             break;
         case "main":
             main.classList.remove("d-none");
@@ -22,6 +24,7 @@ function togglePages(page) {
             login.classList.remove("d-flex");
             login.classList.add("d-none");
             kickCounter.classList.add("d-none");
+            kickCounter.classList.remove("d-flex");
             break;
         case "kickCounter":
             kickCounter.classList.add("d-flex");
@@ -33,6 +36,7 @@ function togglePages(page) {
             break;
         default:
             login.classList.remove("d-none");
+            login.classList.add("d-flex");
             main.classList.add("d-none");
             main.classList.remove("d-flex");
             kickCounter.classList.add("d-none");
@@ -74,7 +78,7 @@ function goToMain(json) {
                         '            </div>\n' +
                         '            <div class="d-flex ml-3">\n' +
                         `                <h3>Duration: ${getDuration(k.end_time, k.start_time)}</h3>\n` +
-                        `            </div><canvas id='myChart${k.id}' width="400" height="400" class="d-none m-2"></canvas>` +
+                        `            </div><canvas id='myChart${k.id}' width="400" height="400" class="d-none p-2"></canvas>` +
                         '<hr></div>\n';
                 });
 
@@ -133,6 +137,7 @@ function updateKickSession(json) {
         const kickList = document.getElementsByClassName("kicks");
         let kickNum = +kickList.item(kickList.length - 1).id + 1;
         let isoTime = moment(kick.time);
+        const zone = isoTime.zone() / 60;
         let time = isoTime.subtract(zone, 'hours');
         let kicksHtml =
             `<div class="d-flex flex-column kicks" id="${kickNum}" >\n` +
@@ -190,8 +195,7 @@ function doAjaxCall(method, data, url, form, callback) {
     let xhr = new XMLHttpRequest();
     xhr.onload = callback;
     xhr.open(method, url, true);
-    console.log(method);
-    console.log(url);
+    console.log(method + url);
     if (form) {
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     }
@@ -208,10 +212,8 @@ function getKickSessionGraph(kickSessionId) {
             if (err) {
                 console.error(err);
             } else {
-                console.log('myChart' + kickSessionId);
                 const collapseDiv = document.getElementById('myChart' + kickSessionId);
                 collapseDiv.classList.remove('d-none');
- console.log(data);
                 let myChart = new Chart(collapseDiv.getContext('2d'), {
                     type: 'bar',
                     data: {
@@ -219,22 +221,6 @@ function getKickSessionGraph(kickSessionId) {
                         datasets: [{
                             label: 'Kicks per Minute',
                             data: data.data,
-                            // backgroundColor: [
-                            //     'rgba(255, 99, 132, 0.2)',
-                            //     'rgba(54, 162, 235, 0.2)',
-                            //     'rgba(255, 206, 86, 0.2)',
-                            //     'rgba(75, 192, 192, 0.2)',
-                            //     'rgba(153, 102, 255, 0.2)',
-                            //     'rgba(255, 159, 64, 0.2)'
-                            // ],
-                            // borderColor: [
-                            //     'rgba(255, 99, 132, 1)',
-                            //     'rgba(54, 162, 235, 1)',
-                            //     'rgba(255, 206, 86, 1)',
-                            //     'rgba(75, 192, 192, 1)',
-                            //     'rgba(153, 102, 255, 1)',
-                            //     'rgba(255, 159, 64, 1)'
-                            // ],
                             borderWidth: 1
                         }]
                     },
@@ -276,7 +262,7 @@ function getData(kickSessionId, callback) {
                 let num = minutes.filter(minute => minute === i).length;
                 minutesAgg.push(num);
                 if (num > maxLength) {
-                   maxLength = num;
+                    maxLength = num;
                 }
             }
             callback(null, {
